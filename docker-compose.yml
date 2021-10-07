@@ -1,0 +1,37 @@
+version: "3.3"
+services:
+  
+  mysql-db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'db'
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: 'password'
+      MYSQL_ROOT_PASSWORD: 'password'
+    ports:
+      - '3306:3306'
+    volumes:
+      - ./db:/var/lib/mysql
+     # - ./script.sql:/docker-entrypoint-initdb.d/script.sql 
+  web:
+    build: ./apache
+    ports:
+      - 80:80
+      - 443:443
+    volumes: 
+      - ./web1:/app/main/
+      - ./web2:/app/sub/
+      - ./storage:/app/storage/
+    depends_on:
+      - mysql-db
+
+  phpmyadmin:
+    depends_on:
+      - mysql-db
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - '8080:80'
+    environment:
+      PMA_HOST: mysql-db
